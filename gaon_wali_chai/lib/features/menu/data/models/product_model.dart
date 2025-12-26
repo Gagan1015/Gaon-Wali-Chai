@@ -1,6 +1,7 @@
 import 'category_model.dart';
 import 'product_size_model.dart';
 import 'product_variant_model.dart';
+import '../../../../core/utils/json_helpers.dart';
 
 /// Product model
 class ProductModel {
@@ -9,6 +10,7 @@ class ProductModel {
   final String description;
   final double basePrice;
   final String image;
+  final int? categoryId;
   final CategoryModel? category;
   final List<ProductSizeModel> sizes;
   final List<ProductVariantModel> variants;
@@ -21,6 +23,7 @@ class ProductModel {
     required this.description,
     required this.basePrice,
     required this.image,
+    this.categoryId,
     this.category,
     this.sizes = const [],
     this.variants = const [],
@@ -30,11 +33,12 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      description: json['description'] as String? ?? '',
-      basePrice: (json['base_price'] as num).toDouble(),
-      image: json['image'] as String,
+      id: parseInt(json['id']),
+      name: parseString(json['name']),
+      description: parseString(json['description']),
+      basePrice: parseDouble(json['base_price']),
+      image: parseString(json['image']),
+      categoryId: parseIntOrNull(json['category_id']),
       category: json['category'] != null
           ? CategoryModel.fromJson(json['category'] as Map<String, dynamic>)
           : null,
@@ -55,8 +59,8 @@ class ProductModel {
                 )
                 .toList()
           : [],
-      isFeatured: json['is_featured'] as bool? ?? false,
-      isAvailable: json['is_available'] as bool? ?? true,
+      isFeatured: parseBool(json['is_featured']),
+      isAvailable: parseBool(json['is_available'], defaultValue: true),
     );
   }
 

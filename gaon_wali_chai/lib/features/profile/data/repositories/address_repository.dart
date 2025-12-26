@@ -1,0 +1,120 @@
+import '../services/address_api_service.dart';
+import '../models/address_model.dart';
+import '../../../../core/utils/api_response.dart';
+
+/// Address Repository
+class AddressRepository {
+  final AddressApiService _apiService = AddressApiService();
+
+  // Get all addresses
+  Future<ApiResponse<List<AddressModel>>> getAddresses() async {
+    final response = await _apiService.getAddresses();
+
+    if (response.success) {
+      final data = response.data as Map<String, dynamic>;
+      final addressesJson = data['data'] as List;
+      final addresses = addressesJson
+          .map((json) => AddressModel.fromJson(json))
+          .toList();
+
+      return ApiResponse.success(addresses);
+    }
+
+    return ApiResponse.error(response.message ?? 'Failed to get addresses');
+  }
+
+  // Create address
+  Future<ApiResponse<AddressModel>> createAddress({
+    required String type,
+    required String streetAddress,
+    String? apartment,
+    String? landmark,
+    required String city,
+    required String state,
+    required String pincode,
+    String? phoneNumber,
+    bool isDefault = false,
+  }) async {
+    final response = await _apiService.createAddress(
+      type: type,
+      streetAddress: streetAddress,
+      apartment: apartment,
+      landmark: landmark,
+      city: city,
+      state: state,
+      pincode: pincode,
+      phoneNumber: phoneNumber,
+      isDefault: isDefault,
+    );
+
+    if (response.success) {
+      final data = response.data as Map<String, dynamic>;
+      final address = AddressModel.fromJson(data['data']);
+
+      return ApiResponse.success(address);
+    }
+
+    return ApiResponse.error(response.message ?? 'Failed to create address');
+  }
+
+  // Get address details
+  Future<ApiResponse<AddressModel>> getAddressDetails(int addressId) async {
+    final response = await _apiService.getAddressDetails(addressId);
+
+    if (response.success) {
+      final data = response.data as Map<String, dynamic>;
+      final address = AddressModel.fromJson(data['data']);
+
+      return ApiResponse.success(address);
+    }
+
+    return ApiResponse.error(response.message ?? 'Failed to get address');
+  }
+
+  // Update address
+  Future<ApiResponse<AddressModel>> updateAddress(
+    int addressId, {
+    String? type,
+    String? streetAddress,
+    String? apartment,
+    String? landmark,
+    String? city,
+    String? state,
+    String? pincode,
+    String? phoneNumber,
+    bool? isDefault,
+  }) async {
+    final response = await _apiService.updateAddress(
+      addressId,
+      type: type,
+      streetAddress: streetAddress,
+      apartment: apartment,
+      landmark: landmark,
+      city: city,
+      state: state,
+      pincode: pincode,
+      phoneNumber: phoneNumber,
+      isDefault: isDefault,
+    );
+
+    if (response.success) {
+      final data = response.data as Map<String, dynamic>;
+      final address = AddressModel.fromJson(data['data']);
+
+      return ApiResponse.success(address);
+    }
+
+    return ApiResponse.error(response.message ?? 'Failed to update address');
+  }
+
+  // Delete address
+  Future<ApiResponse<String>> deleteAddress(int addressId) async {
+    final response = await _apiService.deleteAddress(addressId);
+
+    if (response.success) {
+      return ApiResponse.success('Address deleted successfully');
+    }
+
+    return ApiResponse.error(response.message ?? 'Failed to delete address');
+  }
+}

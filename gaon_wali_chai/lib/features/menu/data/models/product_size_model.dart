@@ -1,4 +1,6 @@
 /// Product size model
+import '../../../../core/utils/json_helpers.dart';
+
 class ProductSizeModel {
   final int id;
   final int productId;
@@ -16,11 +18,11 @@ class ProductSizeModel {
 
   factory ProductSizeModel.fromJson(Map<String, dynamic> json) {
     return ProductSizeModel(
-      id: json['id'] as int,
-      productId: json['product_id'] as int,
-      name: json['name'] as String,
-      price: (json['price'] as num).toDouble(),
-      isAvailable: json['is_available'] as bool? ?? true,
+      id: parseInt(json['id']),
+      productId: parseInt(json['product_id']),
+      name: parseString(json['name']),
+      price: parseDouble(json['price']),
+      isAvailable: parseBool(json['is_available'], defaultValue: true),
     );
   }
 

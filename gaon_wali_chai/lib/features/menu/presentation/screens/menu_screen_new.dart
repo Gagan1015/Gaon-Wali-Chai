@@ -6,6 +6,7 @@ import '../widgets/category_tab_bar.dart';
 import '../widgets/product_grid.dart';
 import '../../data/models/category_model.dart';
 import '../../data/models/product_model.dart';
+import '../../data/repositories/product_repository.dart';
 import 'product_detail_screen.dart';
 
 /// Menu screen - Product listing with categories
@@ -17,101 +18,66 @@ class MenuScreenNew extends StatefulWidget {
 }
 
 class _MenuScreenNewState extends State<MenuScreenNew> {
-  int selectedCategoryId = 1;
-  bool isLoading = false;
+  final ProductRepository _productRepository = ProductRepository();
+
+  int? selectedCategoryId;
+  bool isLoading = true;
   String? errorMessage;
 
-  // Mock data - Replace with actual API calls later
-  final List<CategoryModel> _categories = [
-    CategoryModel(id: 1, name: 'All', sortOrder: 0),
-    CategoryModel(id: 2, name: 'Hot Drinks', sortOrder: 1),
-    CategoryModel(id: 3, name: 'Kulhad Chai', sortOrder: 2),
-    CategoryModel(id: 4, name: 'Snacks', sortOrder: 3),
-    CategoryModel(id: 5, name: 'Desserts', sortOrder: 4),
-    CategoryModel(id: 6, name: 'Cold Drinks', sortOrder: 5),
-  ];
+  List<CategoryModel> _categories = [];
+  List<ProductModel> _allProducts = [];
 
-  final List<ProductModel> _allProducts = [
-    ProductModel(
-      id: 1,
-      name: 'Kulhad Chai',
-      description: 'Traditional Indian tea served in kulhad',
-      basePrice: 50,
-      image:
-          'https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 2,
-      name: 'Masala Tea',
-      description: 'Spiced tea with authentic Indian masala',
-      basePrice: 60,
-      image:
-          'https://images.unsplash.com/photo-1597318493728-0e6ac91c189e?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 3,
-      name: 'Ginger Tea',
-      description: 'Refreshing tea with fresh ginger',
-      basePrice: 55,
-      image:
-          'https://images.unsplash.com/photo-1576092768792-7e1b1b8e6205?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 4,
-      name: 'Elaichi Tea',
-      description: 'Cardamom flavored aromatic tea',
-      basePrice: 55,
-      image:
-          'https://images.unsplash.com/photo-1597318493728-0e6ac91c189e?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 5,
-      name: 'Samosa',
-      description: 'Crispy fried pastry with savory filling',
-      basePrice: 30,
-      image:
-          'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 6,
-      name: 'Pakora',
-      description: 'Deep fried fritters, perfect with tea',
-      basePrice: 40,
-      image:
-          'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 7,
-      name: 'Gulab Jamun',
-      description: 'Sweet milk-solid based dessert',
-      basePrice: 45,
-      image:
-          'https://images.unsplash.com/photo-1639744091413-f28cd22ed8b4?w=400',
-      isAvailable: true,
-    ),
-    ProductModel(
-      id: 8,
-      name: 'Jalebi',
-      description: 'Sweet, crispy, and syrupy dessert',
-      basePrice: 50,
-      image:
-          'https://images.unsplash.com/photo-1639744091413-f28cd22ed8b4?w=400',
-      isAvailable: false,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
 
   List<ProductModel> get _filteredProducts {
-    if (selectedCategoryId == 1) {
+    if (selectedCategoryId == null) {
       return _allProducts;
     }
-    // TODO: Filter by actual category when backend is ready
-    return _allProducts;
+    return _allProducts
+        .where((product) => product.categoryId == selectedCategoryId)
+        .toList();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      // Load categories
+      final categoriesResponse = await _productRepository.getCategories();
+
+      if (!categoriesResponse.success) {
+        throw Exception(categoriesResponse.message);
+      }
+
+      // Load products
+      final productsResponse = await _productRepository.getProducts();
+
+      if (!productsResponse.success) {
+        throw Exception(productsResponse.message);
+      }
+
+      if (mounted) {
+        setState(() {
+          _categories = categoriesResponse.data ?? [];
+          _allProducts = productsResponse.data ?? [];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = e.toString().replaceAll('Exception: ', '');
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -148,7 +114,7 @@ class _MenuScreenNewState extends State<MenuScreenNew> {
                 // Category tabs
                 CategoryTabBar(
                   categories: _categories,
-                  selectedCategoryId: selectedCategoryId,
+                  selectedCategoryId: selectedCategoryId ?? 0,
                   onCategorySelected: _onCategorySelected,
                 ),
                 const SizedBox(height: 20),
@@ -183,7 +149,6 @@ class _MenuScreenNewState extends State<MenuScreenNew> {
     setState(() {
       selectedCategoryId = category.id;
     });
-    // TODO: Fetch products for selected category
   }
 
   void _onProductTap(ProductModel product) {
@@ -196,36 +161,16 @@ class _MenuScreenNewState extends State<MenuScreenNew> {
   }
 
   void _onAddToCart(ProductModel product) {
-    // TODO: Add product to cart
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${product.name} added to cart'),
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppColors.success,
-        action: SnackBarAction(
-          label: 'VIEW',
-          textColor: AppColors.textLight,
-          onPressed: () {
-            // TODO: Navigate to cart
-          },
-        ),
+    // Navigate to product details to select size/variants
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(product: product),
       ),
     );
   }
 
   Future<void> _refreshData() async {
-    setState(() {
-      isLoading = true;
-      errorMessage = null;
-    });
-
-    // TODO: Fetch data from API
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
+    await _loadData();
   }
 }

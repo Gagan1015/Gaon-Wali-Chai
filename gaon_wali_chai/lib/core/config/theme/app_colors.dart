@@ -20,6 +20,7 @@ class AppColors {
   static const Color background = Color(0xFFFFF8F0); // Light cream
   static const Color surface = Color(0xFFFFFFFF); // White
   static const Color cardBackground = Color(0xFFFFFFFF); // White
+  static const Color white = Color(0xFFFFFFFF); // White
 
   // Text Colors
   static const Color textPrimary = Color(
@@ -28,6 +29,7 @@ class AppColors {
   static const Color textSecondary = Color(0xFF8B7355); // Medium brown
   static const Color textLight = Color(0xFFFFFFFF); // White
   static const Color textHint = Color(0xFFB8A391); // Light brown
+  static const Color textTertiary = Color(0xFFB8A391); // Light brown
 
   // UI Element Colors
   static const Color border = Color(0xFFE8D5C4); // Light brown border

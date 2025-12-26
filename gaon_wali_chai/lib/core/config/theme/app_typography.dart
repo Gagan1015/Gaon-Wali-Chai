@@ -54,6 +54,14 @@ class AppTypography {
     height: 1.5,
   );
 
+  static const TextStyle h6 = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    fontFamily: fontFamily,
+    height: 1.5,
+  );
+
   // Body Text
   static const TextStyle body1 = TextStyle(
     fontSize: 16,

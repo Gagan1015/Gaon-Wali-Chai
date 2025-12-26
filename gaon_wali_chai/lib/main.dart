@@ -9,6 +9,7 @@ import 'features/auth/presentation/screens/sign_up_screen.dart';
 import 'features/auth/presentation/screens/verify_code_screen.dart';
 import 'features/auth/presentation/screens/forgot_password_screen.dart';
 import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/cart/presentation/providers/cart_provider.dart';
 import 'shared/screens/main_screen.dart';
 
 void main() {
@@ -16,6 +17,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => CartProvider()..initialize()),
       ],
       child: const MyApp(),
     ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/config/theme/app_colors.dart';
 import '../../../../core/config/theme/app_typography.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../shared/widgets/custom_app_bar.dart';
 import '../../../../shared/widgets/custom_button.dart';
+import '../../../cart/data/repositories/cart_repository.dart';
+import '../../../cart/presentation/providers/cart_provider.dart';
 import '../widgets/size_selector.dart';
 import '../widgets/variant_item.dart';
 import '../../data/models/product_model.dart';
@@ -21,9 +24,12 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  final CartRepository _cartRepository = CartRepository();
+
   int? selectedSizeId;
   Set<int> selectedVariantIds = {};
   int quantity = 1;
+  bool isAddingToCart = false;
 
   @override
   void initState() {
@@ -313,8 +319,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Expanded(
               child: CustomButton(
                 text: 'Add to Cart',
-                onPressed: widget.product.isAvailable ? _addToCart : () {},
-                isLoading: false,
+                onPressed: (widget.product.isAvailable && !isAddingToCart)
+                    ? _addToCart
+                    : () {},
+                isLoading: isAddingToCart,
                 width: double.infinity,
               ),
             ),
@@ -340,22 +348,65 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
   }
 
-  void _addToCart() {
-    // TODO: Implement add to cart functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${widget.product.name} added to cart'),
-        backgroundColor: AppColors.success,
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'VIEW CART',
-          textColor: AppColors.textLight,
-          onPressed: () {
-            // TODO: Navigate to cart
-          },
+  void _addToCart() async {
+    setState(() {
+      isAddingToCart = true;
+    });
+
+    try {
+      final cartProvider = context.read<CartProvider>();
+      final success = await cartProvider.addToCart(
+        productId: widget.product.id,
+        sizeId: selectedSizeId,
+        variantIds: selectedVariantIds.isNotEmpty
+            ? selectedVariantIds.toList()
+            : null,
+        quantity: quantity,
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${widget.product.name} added to cart'),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 2),
+            action: SnackBarAction(
+              label: 'VIEW CART',
+              textColor: AppColors.textLight,
+              onPressed: () {
+                // TODO: Navigate to cart
+              },
+            ),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(cartProvider.errorMessage ?? 'Failed to add to cart'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 2),
         ),
-      ),
-    );
-    Navigator.pop(context);
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isAddingToCart = false;
+        });
+      }
+    }
   }
 }

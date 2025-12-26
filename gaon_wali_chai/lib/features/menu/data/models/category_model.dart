@@ -1,4 +1,6 @@
 /// Category model
+import '../../../../core/utils/json_helpers.dart';
+
 class CategoryModel {
   final int id;
   final String name;
@@ -16,11 +18,11 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      icon: json['icon'] as String?,
-      sortOrder: json['sort_order'] as int? ?? 0,
-      isActive: json['is_active'] as bool? ?? true,
+      id: parseInt(json['id']),
+      name: parseString(json['name']),
+      icon: parseStringOrNull(json['icon']),
+      sortOrder: parseInt(json['sort_order']),
+      isActive: parseBool(json['is_active'], defaultValue: true),
     );
   }
 
