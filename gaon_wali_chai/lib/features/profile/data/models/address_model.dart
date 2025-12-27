@@ -1,14 +1,15 @@
+import 'package:flutter/material.dart';
+
+/// Address Model - Matches backend API structure
 class AddressModel {
   final int id;
   final int userId;
-  final String type;
-  final String streetAddress;
-  final String? apartment;
-  final String? landmark;
+  final String label; // Home, Work, Other
+  final String addressLine1;
+  final String? addressLine2;
   final String city;
   final String state;
   final String pincode;
-  final String? phoneNumber;
   final bool isDefault;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -16,14 +17,12 @@ class AddressModel {
   AddressModel({
     required this.id,
     required this.userId,
-    required this.type,
-    required this.streetAddress,
-    this.apartment,
-    this.landmark,
+    required this.label,
+    required this.addressLine1,
+    this.addressLine2,
     required this.city,
     required this.state,
     required this.pincode,
-    this.phoneNumber,
     required this.isDefault,
     required this.createdAt,
     required this.updatedAt,
@@ -33,14 +32,12 @@ class AddressModel {
     return AddressModel(
       id: json['id'],
       userId: json['user_id'],
-      type: json['type'],
-      streetAddress: json['street_address'],
-      apartment: json['apartment'],
-      landmark: json['landmark'],
+      label: json['label'],
+      addressLine1: json['address_line1'],
+      addressLine2: json['address_line2'],
       city: json['city'],
       state: json['state'],
       pincode: json['pincode'],
-      phoneNumber: json['phone_number'],
       isDefault: json['is_default'] == 1 || json['is_default'] == true,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
@@ -49,38 +46,37 @@ class AddressModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'user_id': userId,
-      'type': type,
-      'street_address': streetAddress,
-      'apartment': apartment,
-      'landmark': landmark,
+      'label': label,
+      'address_line1': addressLine1,
+      'address_line2': addressLine2,
       'city': city,
       'state': state,
       'pincode': pincode,
-      'phone_number': phoneNumber,
       'is_default': isDefault,
     };
   }
 
   String get fullAddress {
-    List<String> parts = [streetAddress];
-    if (apartment != null) parts.add(apartment!);
-    if (landmark != null) parts.add('Near $landmark');
+    List<String> parts = [addressLine1];
+    if (addressLine2 != null && addressLine2!.isNotEmpty) {
+      parts.add(addressLine2!);
+    }
     parts.add('$city, $state - $pincode');
     return parts.join(', ');
   }
 
-  String get typeDisplay {
-    switch (type) {
+  String get shortAddress {
+    return '$addressLine1, $city';
+  }
+
+  IconData get labelIcon {
+    switch (label.toLowerCase()) {
       case 'home':
-        return 'Home';
+        return Icons.home;
       case 'work':
-        return 'Work';
-      case 'other':
-        return 'Other';
+        return Icons.work;
       default:
-        return type;
+        return Icons.location_on;
     }
   }
 }

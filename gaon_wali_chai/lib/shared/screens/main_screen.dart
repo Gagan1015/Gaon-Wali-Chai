@@ -10,19 +10,22 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 
 /// Main screen wrapper with bottom navigation
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final int initialIndex;
+
+  const MainScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+  late int _currentIndex;
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
     // Initialize screens once
     _screens = [
       const HomeScreenNew(key: PageStorageKey('home')),

@@ -38,6 +38,7 @@ class AppColors {
 
   // Status Colors
   static const Color success = Color(0xFF4CAF50); // Green
+  static const Color matchaGreen = Color(0xFF88B04B); // Matcha green
   static const Color error = Color(0xFFF44336); // Red
   static const Color warning = Color(0xFFFFA726); // Orange
   static const Color info = Color(0xFF2196F3); // Blue

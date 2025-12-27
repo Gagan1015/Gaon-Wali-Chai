@@ -367,21 +367,72 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (!mounted) return;
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+        scaffoldMessenger
+            .clearSnackBars(); // Clear any existing snackbars first
+        scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text('${widget.product.name} added to cart'),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 2),
-            action: SnackBarAction(
-              label: 'VIEW CART',
-              textColor: AppColors.textLight,
-              onPressed: () {
-                // TODO: Navigate to cart
-              },
+            content: Row(
+              children: [
+                const Icon(
+                  Icons.check_circle_outline,
+                  color: AppColors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '${widget.product.name} added to cart',
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    scaffoldMessenger.hideCurrentSnackBar();
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/main',
+                      (route) => false,
+                      arguments: 2,
+                    );
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text(
+                    'VIEW CART',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                InkWell(
+                  onTap: () {
+                    scaffoldMessenger.hideCurrentSnackBar();
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: const Padding(
+                    padding: EdgeInsets.all(4),
+                    child: Icon(Icons.close, color: AppColors.white, size: 18),
+                  ),
+                ),
+              ],
             ),
+            backgroundColor: AppColors.matchaGreen,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 3),
           ),
         );
-        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

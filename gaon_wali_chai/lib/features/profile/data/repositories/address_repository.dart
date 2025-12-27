@@ -25,25 +25,21 @@ class AddressRepository {
 
   // Create address
   Future<ApiResponse<AddressModel>> createAddress({
-    required String type,
-    required String streetAddress,
-    String? apartment,
-    String? landmark,
+    required String label,
+    required String addressLine1,
+    String? addressLine2,
     required String city,
     required String state,
     required String pincode,
-    String? phoneNumber,
     bool isDefault = false,
   }) async {
     final response = await _apiService.createAddress(
-      type: type,
-      streetAddress: streetAddress,
-      apartment: apartment,
-      landmark: landmark,
+      label: label,
+      addressLine1: addressLine1,
+      addressLine2: addressLine2,
       city: city,
       state: state,
       pincode: pincode,
-      phoneNumber: phoneNumber,
       isDefault: isDefault,
     );
 
@@ -74,26 +70,22 @@ class AddressRepository {
   // Update address
   Future<ApiResponse<AddressModel>> updateAddress(
     int addressId, {
-    String? type,
-    String? streetAddress,
-    String? apartment,
-    String? landmark,
+    String? label,
+    String? addressLine1,
+    String? addressLine2,
     String? city,
     String? state,
     String? pincode,
-    String? phoneNumber,
     bool? isDefault,
   }) async {
     final response = await _apiService.updateAddress(
       addressId,
-      type: type,
-      streetAddress: streetAddress,
-      apartment: apartment,
-      landmark: landmark,
+      label: label,
+      addressLine1: addressLine1,
+      addressLine2: addressLine2,
       city: city,
       state: state,
       pincode: pincode,
-      phoneNumber: phoneNumber,
       isDefault: isDefault,
     );
 

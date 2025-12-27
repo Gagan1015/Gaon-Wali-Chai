@@ -8,6 +8,7 @@ import '../../../../shared/widgets/custom_app_bar.dart';
 import '../../../../shared/widgets/custom_button.dart';
 import '../../../../shared/widgets/error_widget.dart';
 import '../../../../shared/widgets/confirmation_bottom_sheet.dart';
+import '../../../profile/data/repositories/address_repository.dart';
 import '../../data/models/cart_item_model.dart';
 import '../providers/cart_provider.dart';
 
@@ -23,6 +24,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final StorageService _storageService = StorageService();
+  final AddressRepository _addressRepository = AddressRepository();
   bool isAuthenticated = false;
 
   @override
@@ -183,14 +185,51 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void _proceedToCheckout() {
-    // TODO: Navigate to checkout/address selection
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Checkout feature coming soon!'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+  void _proceedToCheckout() async {
+    // Check if user has addresses
+    final addressResponse = await _addressRepository.getAddresses();
+
+    if (!mounted) return;
+
+    if (addressResponse.success &&
+        addressResponse.data != null &&
+        addressResponse.data!.isNotEmpty) {
+      // User has addresses, proceed to checkout
+      Navigator.pushNamed(context, '/checkout');
+    } else {
+      // No addresses found, ask user to add address first
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.location_on, color: AppColors.primary),
+              const SizedBox(width: 8),
+              const Text('Add Delivery Address'),
+            ],
+          ),
+          content: const Text(
+            'Please add a delivery address to proceed with checkout.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/addresses');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              child: const Text('Add Address'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
 

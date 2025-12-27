@@ -238,6 +238,32 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Update Profile
+  Future<bool> updateProfile({required String name, String? email}) async {
+    if (_token == null) return false;
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    final result = await _remoteDatasource.updateProfile(
+      token: _token!,
+      name: name,
+      email: email,
+    );
+
+    if (result['success']) {
+      _user = result['user'];
+    } else {
+      _error = result['message'];
+    }
+
+    _isLoading = false;
+    notifyListeners();
+
+    return result['success'];
+  }
+
   // Clear error
   void clearError() {
     _error = null;

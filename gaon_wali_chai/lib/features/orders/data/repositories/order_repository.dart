@@ -7,20 +7,20 @@ class OrderRepository {
   final OrderApiService _apiService = OrderApiService();
 
   // Create order
-  Future<ApiResponse<OrderModel>> createOrder({
-    int? addressId,
+  Future<ApiResponse<String>> createOrder({
+    required String paymentMethod,
+    required int deliveryAddressId,
     String? specialInstructions,
   }) async {
     final response = await _apiService.createOrder(
-      addressId: addressId,
+      paymentMethod: paymentMethod,
+      deliveryAddressId: deliveryAddressId,
       specialInstructions: specialInstructions,
     );
 
     if (response.success) {
-      final data = response.data as Map<String, dynamic>;
-      final order = OrderModel.fromJson(data['data']);
-
-      return ApiResponse.success(order);
+      // Backend returns simplified response, not full order object
+      return ApiResponse.success('Order created successfully');
     }
 
     return ApiResponse.error(response.message ?? 'Failed to create order');
@@ -44,8 +44,8 @@ class OrderRepository {
   }
 
   // Get order details
-  Future<ApiResponse<OrderModel>> getOrderDetails(int orderId) async {
-    final response = await _apiService.getOrderDetails(orderId);
+  Future<ApiResponse<OrderModel>> getOrderDetails(String orderNumber) async {
+    final response = await _apiService.getOrderDetails(orderNumber);
 
     if (response.success) {
       final data = response.data as Map<String, dynamic>;

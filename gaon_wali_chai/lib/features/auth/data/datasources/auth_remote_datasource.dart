@@ -298,4 +298,41 @@ class AuthRemoteDatasource {
       return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
+
+  // Update Profile
+  Future<Map<String, dynamic>> updateProfile({
+    required String token,
+    required String name,
+    String? email,
+  }) async {
+    try {
+      final Map<String, dynamic> body = {'name': name};
+      if (email != null && email.isNotEmpty) {
+        body['email'] = email;
+      }
+
+      final response = await http.put(
+        Uri.parse(ApiConstants.updateProfile),
+        headers: ApiConstants.authHeaders(token),
+        body: jsonEncode(body),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'user': User.fromJson(data['data']['user']),
+          'message': data['message'] ?? 'Profile updated successfully',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to update profile',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
 }

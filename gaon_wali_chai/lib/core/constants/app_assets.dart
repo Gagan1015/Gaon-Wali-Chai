@@ -2,7 +2,7 @@ class AppAssets {
   // Images
   static const String logo = 'assets/images/Gaonwali Chai-logo 1.png';
   static const String splashLogo = 'assets/images/Gaonwali Chai-logo 1.png';
-  static const String heroPage = 'assets/images/hero_page.png';
+  static const String heroPage = 'assets/images/white tea cup 1.png';
   static const String chaiCup = 'assets/images/cup 6.png';
   static const String whiteTeaCup = 'assets/images/white tea cup 1.png';
   static const String rectangle = 'assets/images/Rectangle 2.png';

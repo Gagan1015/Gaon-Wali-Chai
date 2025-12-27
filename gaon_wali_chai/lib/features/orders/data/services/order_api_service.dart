@@ -8,16 +8,18 @@ class OrderApiService {
 
   // Create order
   Future<ApiResponse> createOrder({
-    int? addressId,
+    required String paymentMethod,
+    required int deliveryAddressId,
     String? specialInstructions,
   }) async {
     final body = {
-      if (addressId != null) 'address_id': addressId,
+      'payment_method': paymentMethod,
+      'delivery_address_id': deliveryAddressId,
       if (specialInstructions != null)
         'special_instructions': specialInstructions,
     };
 
-    return await _api.post(ApiConfig.orders, body);
+    return await _api.post(ApiConfig.orders, body, requiresAuth: true);
   }
 
   // Get all orders
@@ -26,11 +28,14 @@ class OrderApiService {
     if (status != null) {
       endpoint += '?status=$status';
     }
-    return await _api.get(endpoint);
+    return await _api.get(endpoint, requiresAuth: true);
   }
 
   // Get order details
-  Future<ApiResponse> getOrderDetails(int orderId) async {
-    return await _api.get('${ApiConfig.orders}/$orderId');
+  Future<ApiResponse> getOrderDetails(String orderNumber) async {
+    return await _api.get(
+      '${ApiConfig.orders}/$orderNumber',
+      requiresAuth: true,
+    );
   }
 }
